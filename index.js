@@ -320,7 +320,7 @@ function addDept() {
         type: "input",
         message: "Department Name: "
     }).then((answer) => {
-        connection.query(`INSERT INTO department (name) VALUES ("${answer.deptName}");`, (err, res) =>
+        connection.query(`INSERT INTO department (name) VALUES ("${answer.deptName}");`, (err, res) => {
         if (err) return err;
         console.log("\n DEPARTMENT ADDED...\n");
         mainMenu();
@@ -341,7 +341,7 @@ function updEmpRole() {
         for (i = 0; i < roles.length; i++){
             role.Arr.push(roles[i].title);
         }
-        for (i = 0; < employees.length; i++){
+        for (i = 0; i < employees.length; i++){
             employeeArr.push(employees[i].Employee);
         }
     }).then(([roles, employees]) => {
