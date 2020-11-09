@@ -74,10 +74,10 @@ function mainMenu() {
                 remEmp();
                 break;
             case "Remove role":
-                RemRole();
+                remRole();
                 break;
             case "Remove department":
-                RemDept();
+                remDept();
                 break;
             case "View department budgets":
                 viewDeptBudget();
@@ -377,5 +377,149 @@ function updEmpRole() {
                 mainMenu();
             });
         });
+    });
+}
+
+function updEmpMan() {
+    let employeeArr = [];
+    promisemysql.createConnection(connectionProperties)
+    .then((employees) => {
+        for (i=0; i < employees.length; i++){
+            employeeArr.push(employees[i].Employee);
+        }
+        return employees;
+    }).then((employees) => {
+        inquirer.prompt([
+            {
+                name: "employee",
+                type: "list",
+                message: "Who would you like to edit?",
+                choices: employeeArr
+            },
+            {
+                name: "manager",
+                type: "list",
+                message: "Who is their new Manager?",
+                choices: employeeArr
+            },
+        ]).then((answer) => {
+            let employeeID;
+            let managerID;
+            for (i=0; i < employees.length; i++){
+                if (answer.employee == employees[i].Employee){
+                    employeeID = employees[i].id;
+                }
+            }
+            for (i=0; i < employees.length; i++){
+                if (answer.manager == employees[i].Employee){
+                    managerID = employees[i].id;
+                }
+            }
+            connection.query(`UPDATE employee SET manager_id = ${managerID} WHERE id = ${employeeID}`, (err, res) => {
+                if(err) return err;
+                console.log(`\n ${answer.employee} MANAGER UPDATED TO ${answer.manager}...\n`);
+                mainMenu();
+            });
+        });
+    });
+}
+
+function remEmp() {
+    let employeeArr = [];
+    promisemysql.createConnection(connectionProperties)
+    .then((conn) => {
+        return conn.query("SELECT employee.id, concat(employee.first_name, ' ', employee.last_name) AS employee FROM employee ORDER BY employee ASC"); 
+    }).then((employees) => {
+        for (i=0; i < employees.length; i++){
+            employeeArr.push(employees[i].employee);
+        }
+        inquirer.prompt([
+            {
+                name: "employee",
+                type: "list",
+                message: "Who would you like to remove?",
+                choices: employeeArr
+            },
+            {
+                name: "yesNo",
+                type: "list",
+                message: "Confirm removal",
+                choices: ["NO", "YES"]
+            }
+        ]).then((answer) => {
+            if(answer.yesNo == "YES"){
+                let employeeID;
+                for (i=0; i < employees.length; i++){
+                    if (answer.employee == employees[i].employee){
+                        employeeID = employees[i].id;
+                    }
+                }
+                connection.query(`DELETE FROM employee WHERE id=${employeeID};`, (err, res) => {
+                    if(err) return err;
+                    console.log(`\n EMPLOYEE '${answer.employee}' DELETED...\n `);
+                    mainMenu();    
+                });   
+            }
+            else {
+                console.log(`\n EMPLOYEE '${answer.employee}' NOT DELETED...\n `);
+                mainMenu();
+            }
+        });
+    });    
+}
+
+function remRole() {
+    let roleArr = [];
+    promisemysql.createConnection(connectionProperties)
+    .then((conn) => {
+        return conn.query("SELECT id, title FROM role");
+    }).then((roles) => {
+        for (i = 0; i < roles.length; i++) {
+            roleArr.push(roles[i].title);
+        }
+        inquirer.prompt([
+            {
+                name: "continueRemove",
+                type: "list",
+                message: "If you remove a role, this will remove all employees associated with that role. Do you want to continue?",
+                choices: ["NO", "YES"]
+            }
+        ]).then((answer) => {
+            if (answer.continueRemove === "NO") {
+                mainMenu();
+            }
+        }).then(() => {
+            inquirer.prompt([
+                {
+                    name: "role",
+                    type: "list",
+                    message: "Which role would you like to remove?",
+                    choices: roleArr
+                },
+                {
+                    name: "confirmRemove",
+                    type: "input",
+                    message: "Please type the role to confirm removal"
+                }
+            ]).then((answer) => {
+                if(answer.confirmRemove === answer.role){
+                    let roleID;
+                    for (i = 0; i < roles.length; i++) {
+                        if (answer.role == roles[i].title) {
+                            roleID = roles[i].id;
+                        }
+                    }
+                connection.query(`DELETE FROM role WHERE id=${roleID};`, (err, res) => {
+                    if (err) return err;
+                    console.log(`\n ROLE '${answer.role}' REMOVED...\n `);
+                    mainMenu();
+                });
+                } 
+                else {
+                console.log(`\n ROLE '${answer.role}' NOT DELETED...\n `);
+                mainMenu();
+                }
+            });
+        })
     });
 }
