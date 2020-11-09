@@ -270,3 +270,112 @@ function addEmp() {
         });
 }
 
+function addRole() {
+    let departmentArr = [];
+    promisemysql.createConnection(connectionProperties)
+    .then((conn) => {
+        return conn.query('SELECT id, name FROM department ORDER BY name ASC');
+    }).then((departments) => {
+        for (i = 0; i < departments.length; i++){
+            departmentArr.push(departments[i].name);
+        }
+        return departments;
+    }).then((departments) => {
+        inquirer.prompt([
+            {
+                name: "roleTitle",
+                type: "input",
+                message: "Role Title: "
+            },
+            {
+                name: "salary",
+                type: "number",
+                message: "Salary: "
+            },
+            {
+                name: "dept",
+                type: "list",
+                message: "Department",
+                choices: departmentArr
+            }]).then((answer) => {
+                let deptID;
+                for (i = 0; i < departments.length; i++){
+                    if (answer.dept == departments[i].name){
+                        deptID = departments[i].id;
+                    }
+                }
+                connection.query(`INSERT INTO role (title, salary, department_id) VALUES ("${answer.roleTitle}", ${answer.salary}, ${deptID})`,
+                (err, res) => {
+                    if (err) return err;
+                    console.log(`\n ROLE ${answer.roleTitle} ADDED...\n`);
+                    mainMenu();
+                });
+            });
+    });
+}
+
+function addDept() {
+    inquirer.prompt({
+        name: "deptName",
+        type: "input",
+        message: "Department Name: "
+    }).then((answer) => {
+        connection.query(`INSERT INTO department (name) VALUES ("${answer.deptName}");`, (err, res) =>
+        if (err) return err;
+        console.log("\n DEPARTMENT ADDED...\n");
+        mainMenu();
+        });
+    });
+}
+
+function updEmpRole() {
+    let employeeArr = [];
+    let roleArr = [];
+    promisemysql.createConnection(connectionProperties)
+    .then((conn) => {
+        return Promise.all([
+            conn.query('SELECT id, title FROM role ORDER BY title ASC'),
+            conn.query("SELECT employee.id, concat(employee.first_name, ' ', employee.last_name) AS employee FROM employee ORDER BY employee ASC")
+        ]);
+    }).then(([roles, employees]) => {
+        for (i = 0; i < roles.length; i++){
+            role.Arr.push(roles[i].title);
+        }
+        for (i = 0; < employees.length; i++){
+            employeeArr.push(employees[i].Employee);
+        }
+    }).then(([roles, employees]) => {
+        inquirer.prompt([
+            {
+                name: "employee",
+                type: "list",
+                message: "Who would you like to edit?",
+                choices: employeeArr
+            },
+            {
+                name: "role",
+                type: "list",
+                message: "What is their new role?",
+                choices: roleArr
+            },
+        ]).then((answer) => {
+            let roleID;
+            let employeeID;
+            for (i = 0; i < roles.length; i++){
+                if (answer.role == roles[i].title){
+                    roleID = roles[i].id;
+                }
+            }
+            for (i = 0; i < employees.length; i++){
+                if (answer.employee == employees[i].Employee){
+                    employeeID = eomployees[i].id;
+                }
+            }
+            connection.query(`UPDATE employee SET role_id = ${roleID} WHERE id = ${employeeID}`, (err, res) => {
+                if (err) return err;
+                console.log(`\n ${answer.employee} ROLE UPDATED TO ${answer.role}...\n`);
+                mainMenu();
+            });
+        });
+    });
+}
