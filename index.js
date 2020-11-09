@@ -56,28 +56,31 @@ function mainMenu() {
                 viewAllEmpByMan();
                 break;
             case "Add Employee":
-                viewAddEmp();
+                addEmp();
                 break;
             case "Add Role":
-                viewAddRole();
+                addRole();
                 break;
             case "Add Department":
-                viewAddDept();
+                addDept();
                 break;
             case "Update employee role":
-                viewUpdEmpRole();
+                updEmpRole();
                 break; 
             case "Update employee manager":
-                viewUpdEmpMan();
+                updEmpMan();
                 break;
             case "Remove employee":
-                viewRemEmp();
+                remEmp();
                 break;
             case "Remove role":
-                viewRemRole();
+                RemRole();
                 break;
             case "Remove department":
-                viewRemDept();
+                RemDept();
+                break;
+            case "View department budgets":
+                viewDeptBudget();
                 break;
 
         }
