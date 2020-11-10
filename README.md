@@ -7,7 +7,7 @@ Developers are often tasked with creating interfaces that make it easy for non-d
 1. Run `npm install` to install all dependencies
 2. Run `schema.sql` in MySQLWorkbench
     * (Optional) Run `seeds.sql` in MySQLWorkbench
-3. Edit MySQL connection properties in the `connectionProperties` object in `employee-tracker.js`
+3. Edit MySQL connection properties in the `connectionProperties` object in `index.js`
   
 ## Usage
 ---
