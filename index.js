@@ -26,7 +26,7 @@ function mainMenu() {
         message: "MAIN MENU",
         choices: [
             "View all employees",
-            "View all employess by role",
+            "View all employees by role",
             "View all employees by department",
             "View all employees by manager",
             "Add employee",
