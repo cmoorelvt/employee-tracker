@@ -87,7 +87,7 @@ function mainMenu() {
 }
 
 function viewAllEmp() {
-    let query = "SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, concat(m.first_name, ' ', m.last_name) AS manager FROM employee e :EFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id + role.id INNER JOIN department ON role.department_id = department.id ORDER BY ID ASC";
+    let query = "SELECT * FROM employee";
     connection.query(query, function(err, res) {
         if(err) return err;
         console.log("\n");
@@ -117,7 +117,7 @@ function viewAllEmpByRole() {
         connection.query(query, (err, res) => {
             if(err) return err;
             console.log("\n");
-            consoleTable(res);
+            console.table(res);
             mainMenu();
         });
         });
@@ -126,7 +126,7 @@ function viewAllEmpByRole() {
 
 function viewAllEmpByDept() {
     let deptArr = []
-        promisemysql.createConnection(connection)
+        promisemysql.createConnection(connectionProperties)
             .then((conn) => {
                 return conn.query('SELECT name FROM department');
             }).then(function(value) {
@@ -145,7 +145,7 @@ function viewAllEmpByDept() {
                 connection.query(query, (err, res) => {
                     if(err) return err;
                     console.log("\n");
-                    consoleTable(res);
+                    console.table(res);
                     mainMenu();
                 });
             });
@@ -154,7 +154,7 @@ function viewAllEmpByDept() {
 
 function viewAllEmpByMan() {
     let managerArr = [];
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((conn) => {
         return conn.query("SELECT DISTINCT m.id, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e INNER JOIN employee m ON e.manager_id = m.id");
     }).then(function(managers) {
@@ -166,7 +166,7 @@ function viewAllEmpByMan() {
         inquirer.prompt({
             name: "manager",
             type: "list",
-            message: "Which manager would oyu like to search?",
+            message: "Which manager would you like to search?",
             choices: managerArr
         })
         .then((answer) => {
@@ -180,7 +180,7 @@ function viewAllEmpByMan() {
             connection.query(query, (err, res) => {
                 if (err) return err;
                 console.log("\n");
-                consoleTable(res);
+                console.table(res);
                 mainMenu();
             });
         });
@@ -190,7 +190,7 @@ function viewAllEmpByMan() {
 function addEmp() {
     let roleArr = [];
     let managerArr = [];
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((conn) => {
             return Promise.all([
                 conn.query('SELECT id, title FROM role ORDER BY title ASC'),
@@ -272,7 +272,7 @@ function addEmp() {
 
 function addRole() {
     let departmentArr = [];
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((conn) => {
         return conn.query('SELECT id, name FROM department ORDER BY name ASC');
     }).then((departments) => {
@@ -331,7 +331,7 @@ function addDept() {
 function updEmpRole() {
     let employeeArr = [];
     let roleArr = [];
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((conn) => {
         return Promise.all([
             conn.query('SELECT id, title FROM role ORDER BY title ASC'),
@@ -382,7 +382,7 @@ function updEmpRole() {
 
 function updEmpMan() {
     let employeeArr = [];
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((employees) => {
         for (i=0; i < employees.length; i++){
             employeeArr.push(employees[i].Employee);
@@ -426,7 +426,7 @@ function updEmpMan() {
 
 function remEmp() {
     let employeeArr = [];
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((conn) => {
         return conn.query("SELECT employee.id, concat(employee.first_name, ' ', employee.last_name) AS employee FROM employee ORDER BY employee ASC"); 
     }).then((employees) => {
@@ -470,7 +470,7 @@ function remEmp() {
 
 function remRole() {
     let roleArr = [];
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((conn) => {
         return conn.query("SELECT id, title FROM role");
     }).then((roles) => {
@@ -516,7 +516,7 @@ function remRole() {
                 });
                 } 
                 else {
-                console.log(`\n ROLE '${answer.role}' NOT DELETED...\n `);
+                console.log(`\n ROLE '${answer.role}' NOT REMOVED...\n `);
                 mainMenu();
                 }
             });
@@ -526,7 +526,7 @@ function remRole() {
 
 function remDept() {
     let deptArr = [];
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((conn) => {
         return conn.query("SELECT id, name FROM department");
     }).then((depts) => {
@@ -567,12 +567,12 @@ function remDept() {
                     }
                     connection.query(`DELETE FROM department WHERE id=${deptID};`, (err, res) => {
                         if(err) return err;
-                        console.log(`\n DEPARTMENT '${answer.dept}' DELETED...\n `);
+                        console.log(`\n DEPARTMENT '${answer.dept}' REMOVED...\n `);
                         mainMenu();
                     });
                 }
                 else {
-                    console.log(`\n DEPARTMENT '${answer.dept}' NOT DELETED...\n `);
+                    console.log(`\n DEPARTMENT '${answer.dept}' NOT REMOVED...\n `);
                     mainMenu();
                 }
             });    
@@ -581,7 +581,7 @@ function remDept() {
 }
 
 function viewDeptBudget() {
-    promisemysql.createConnection(connection)
+    promisemysql.createConnection(connectionProperties)
     .then((conn) => {
         return  Promise.all([
             conn.query("SELECT department.name AS department, role.salary FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id ORDER BY department ASC"),
@@ -604,7 +604,7 @@ function viewDeptBudget() {
             deptBudgetArr.push(department);
         }
         console.log("\n");
-        consoleTable(deptBudgetArr);
+        console.table(deptBudgetArr);
         mainMenu();
     }); 
 }    
