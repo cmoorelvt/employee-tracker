@@ -11,16 +11,16 @@ const connectionProperties = {
     database: "employees_DB"
 }
 
-const connection = mySql.createConnection(connectionProperties);
-
+const connection = mysql.createConnection(connectionProperties);
 connection.connect((err) => {
-    if (err) throw err;
+    if(err) throw err;
     console.log("\n WELCOME TO EMPLOYEE TRACKER \n");
     mainMenu();
 });
 
 function mainMenu() {
-    inquirer.prompt({
+    inquirer.prompt(
+        {
         name: "action",
         type: "list",
         message: "MAIN MENU",
@@ -91,7 +91,7 @@ function viewAllEmp() {
     connection.query(query, function(err, res) {
         if(err) return err;
         console.log("\n");
-        console.table(res);
+        consoleTable(res);
         mainMenu();
     });
 }
@@ -117,7 +117,7 @@ function viewAllEmpByRole() {
         connection.query(query, (err, res) => {
             if(err) return err;
             console.log("\n");
-            console.table(res);
+            consoleTable(res);
             mainMenu();
         });
         });
@@ -145,7 +145,7 @@ function viewAllEmpByDept() {
                 connection.query(query, (err, res) => {
                     if(err) return err;
                     console.log("\n");
-                    console.table(res);
+                    consoleTable(res);
                     mainMenu();
                 });
             });
@@ -180,7 +180,7 @@ function viewAllEmpByMan() {
             connection.query(query, (err, res) => {
                 if (err) return err;
                 console.log("\n");
-                console.table(res);
+                consoleTable(res);
                 mainMenu();
             });
         });
@@ -604,7 +604,7 @@ function viewDeptBudget() {
             deptBudgetArr.push(department);
         }
         console.log("\n");
-        console.table(deptBudgetArr);
+        consoleTable(deptBudgetArr);
         mainMenu();
     }); 
 }    
