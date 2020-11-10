@@ -4,7 +4,7 @@ const consoleTable = require("console.table");
 const promisemysql = require("promise-mysql");
 
 const connectionProperties = {
-    host: "local host",
+    host: "localhost",
     port: 3306,
     user: "root",
     password: "Uzumaki8!",
@@ -13,7 +13,7 @@ const connectionProperties = {
 
 const connection = mysql.createConnection(connectionProperties);
 connection.connect((err) => {
-    if(err) throw err;
+    if (err) throw err;
     console.log("\n WELCOME TO EMPLOYEE TRACKER \n");
     mainMenu();
 });
@@ -91,7 +91,7 @@ function viewAllEmp() {
     connection.query(query, function(err, res) {
         if(err) return err;
         console.log("\n");
-        consoleTable(res);
+        console.table(res);
         mainMenu();
     });
 }
@@ -126,8 +126,8 @@ function viewAllEmpByRole() {
 
 function viewAllEmpByDept() {
     let deptArr = []
-        promisemysql.createConnection(connectionProperties
-            ).then((conn) => {
+        promisemysql.createConnection(connection)
+            .then((conn) => {
                 return conn.query('SELECT name FROM department');
             }).then(function(value) {
                 deptQuery = value;
@@ -154,7 +154,7 @@ function viewAllEmpByDept() {
 
 function viewAllEmpByMan() {
     let managerArr = [];
-    promisemysql.createConnection(connectionProperties)
+    promisemysql.createConnection(connection)
     .then((conn) => {
         return conn.query("SELECT DISTINCT m.id, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e INNER JOIN employee m ON e.manager_id = m.id");
     }).then(function(managers) {
@@ -190,8 +190,8 @@ function viewAllEmpByMan() {
 function addEmp() {
     let roleArr = [];
     let managerArr = [];
-    promisemysql.createConnection(connectionProperties
-        ).then((conn) => {
+    promisemysql.createConnection(connection)
+    .then((conn) => {
             return Promise.all([
                 conn.query('SELECT id, title FROM role ORDER BY title ASC'),
                 conn.query("SELECT employee.id, concat(employee.first_name, ' ', employee.last_name AS employee FROM employee ORDER BY employee ASC")
@@ -272,7 +272,7 @@ function addEmp() {
 
 function addRole() {
     let departmentArr = [];
-    promisemysql.createConnection(connectionProperties)
+    promisemysql.createConnection(connection)
     .then((conn) => {
         return conn.query('SELECT id, name FROM department ORDER BY name ASC');
     }).then((departments) => {
@@ -331,7 +331,7 @@ function addDept() {
 function updEmpRole() {
     let employeeArr = [];
     let roleArr = [];
-    promisemysql.createConnection(connectionProperties)
+    promisemysql.createConnection(connection)
     .then((conn) => {
         return Promise.all([
             conn.query('SELECT id, title FROM role ORDER BY title ASC'),
@@ -382,7 +382,7 @@ function updEmpRole() {
 
 function updEmpMan() {
     let employeeArr = [];
-    promisemysql.createConnection(connectionProperties)
+    promisemysql.createConnection(connection)
     .then((employees) => {
         for (i=0; i < employees.length; i++){
             employeeArr.push(employees[i].Employee);
@@ -426,7 +426,7 @@ function updEmpMan() {
 
 function remEmp() {
     let employeeArr = [];
-    promisemysql.createConnection(connectionProperties)
+    promisemysql.createConnection(connection)
     .then((conn) => {
         return conn.query("SELECT employee.id, concat(employee.first_name, ' ', employee.last_name) AS employee FROM employee ORDER BY employee ASC"); 
     }).then((employees) => {
@@ -470,7 +470,7 @@ function remEmp() {
 
 function remRole() {
     let roleArr = [];
-    promisemysql.createConnection(connectionProperties)
+    promisemysql.createConnection(connection)
     .then((conn) => {
         return conn.query("SELECT id, title FROM role");
     }).then((roles) => {
@@ -526,7 +526,7 @@ function remRole() {
 
 function remDept() {
     let deptArr = [];
-    promisemysql.createConnection(connectionProperties)
+    promisemysql.createConnection(connection)
     .then((conn) => {
         return conn.query("SELECT id, name FROM department");
     }).then((depts) => {
@@ -581,7 +581,7 @@ function remDept() {
 }
 
 function viewDeptBudget() {
-    promisemysql.createConnection(connectionProperties)
+    promisemysql.createConnection(connection)
     .then((conn) => {
         return  Promise.all([
             conn.query("SELECT department.name AS department, role.salary FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id ORDER BY department ASC"),
